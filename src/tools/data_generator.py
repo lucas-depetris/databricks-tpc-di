@@ -53,20 +53,16 @@ def move_file(source_location, target_location):
   return f"Finished moving {source_location} to {target_location}"
 
 def copy_directory_from_repo(source_dir, target_dir, overwrite):
-  """Copy directory from Databricks workspace (/Repos) to local filesystem using dbutils."""
+  """Copy directory from Databricks workspace (/Repos) to local filesystem."""
   if os.path.exists(target_dir) and overwrite:
     print(f"Overwrite set to true. Deleting: {target_dir}.")
     shutil.rmtree(target_dir)
     print(f"Deleted {target_dir}.")
   try:
-    # Create target directory
-    os.makedirs(target_dir, exist_ok=True)
-    
-    # Use dbutils to recursively copy files from workspace to local
-    # dbutils.fs.cp supports /Repos paths
-    dbutils.fs.cp(source_dir, f"file:{target_dir}", recurse=True)
+    # /Repos is mounted as a local filesystem, use shutil directly
+    dst = shutil.copytree(source_dir, target_dir)
     print(f"Copied {source_dir} to {target_dir} successfully!")
-    return target_dir
+    return dst
   except Exception as e:
     print(f"Error copying directory: {e}")
     raise
