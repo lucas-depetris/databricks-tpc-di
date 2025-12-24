@@ -183,8 +183,12 @@ def generate_data():
     print("\n" + "-" * 80)
     print("Step 1: Copying DIGen tool to driver...")
     # workspace_src_path points to .../databricks-tpc-di/src
+    # Fix path: /Repos/ is not accessible, need /Workspace/Repos/
+    src_path = workspace_src_path
+    if src_path.startswith("/Repos/"):
+      src_path = src_path.replace("/Repos/", "/Workspace/Repos/")
     # datagen is in .../databricks-tpc-di/src/tools/datagen
-    datagen_source_path = f"{workspace_src_path}/tools/datagen"
+    datagen_source_path = f"{src_path}/tools/datagen"
     print(f"  Source path: {datagen_source_path}")
     print(f"  Target path: {driver_tmp_path}")
     copy_directory_from_repo(datagen_source_path, driver_tmp_path, overwrite=True)
