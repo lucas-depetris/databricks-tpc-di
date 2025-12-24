@@ -1,4 +1,29 @@
 # Databricks notebook source
+# DBTITLE 1,Widget Parameters
+# Allow calling this notebook with dbutils.notebook.run() and passing parameters
+dbutils.widgets.text("scale_factor", "10", "Scale Factor")
+dbutils.widgets.text("catalog", "tpcdi", "Catalog")
+dbutils.widgets.text("tpcdi_directory", "", "TPC-DI Directory")
+dbutils.widgets.text("workspace_src_path", "", "Workspace Source Path")
+dbutils.widgets.text("UC_enabled", "True", "Unity Catalog Enabled")
+dbutils.widgets.text("lighthouse", "False", "Lighthouse Flag")
+
+# Read widget values and convert to appropriate types
+scale_factor = dbutils.widgets.get("scale_factor")
+catalog = dbutils.widgets.get("catalog")
+tpcdi_directory = dbutils.widgets.get("tpcdi_directory")
+workspace_src_path = dbutils.widgets.get("workspace_src_path")
+UC_enabled = dbutils.widgets.get("UC_enabled").lower() == "true"
+lighthouse = dbutils.widgets.get("lighthouse").lower() == "true"
+
+# If widgets weren't set (empty strings), check if variables exist in global scope
+# This maintains backward compatibility with the old approach
+if not tpcdi_directory and 'tpcdi_directory' not in globals():
+    print("⚠ tpcdi_directory not provided via widget or global variable")
+if not workspace_src_path and 'workspace_src_path' not in globals():
+    print("⚠ workspace_src_path not provided via widget or global variable")
+
+# COMMAND ----------
 import os
 import concurrent.futures
 import requests
@@ -31,7 +56,7 @@ def generate_data():
   print("Starting Data Generation Process")
   print("=" * 80)
   
-  # Check for required variables that should be set by setup.py
+  # Check for required variables (should be set via widgets or global scope)
   required_vars = {
     'scale_factor': 'Scale factor for data generation',
     'tpcdi_directory': 'TPC-DI directory path',
@@ -43,7 +68,7 @@ def generate_data():
   
   missing_vars = []
   for var_name, description in required_vars.items():
-    if var_name not in globals():
+    if var_name not in globals() or not globals()[var_name]:
       missing_vars.append(f"{var_name} ({description})")
   
   if missing_vars:
@@ -51,10 +76,22 @@ def generate_data():
     print("Missing variables:")
     for var in missing_vars:
       print(f"  - {var}")
-    print("\nThis script requires running the 'TPC-DI Driver.py' notebook,")
-    print("which executes './tools/setup' to define these variables.")
-    print("\nPlease run this script through the 'TPC-DI Driver.py' notebook")
-    print("or ensure 'setup.py' has been executed first.")
+    print("\nThis notebook can be called in two ways:")
+    print("1. Via dbutils.notebook.run() with parameters (recommended)")
+    print("2. Via 'TPC-DI Driver.py' which executes './tools/setup'")
+    print("\nExample dbutils.notebook.run() call:")
+    print('  dbutils.notebook.run(')
+    print('    "path/to/data_generator",')
+    print('    timeout_seconds=3600,')
+    print('    arguments={')
+    print('      "scale_factor": "10",')
+    print('      "catalog": "tpcdi_benchmark",')
+    print('      "tpcdi_directory": "/Volumes/catalog/schema/volume/",')
+    print('      "workspace_src_path": "/Repos/user/repo/src",')
+    print('      "UC_enabled": "True",')
+    print('      "lighthouse": "False"')
+    print('    }')
+    print('  )')
     print("=" * 80)
     return
   
