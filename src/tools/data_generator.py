@@ -167,7 +167,10 @@ def generate_data():
     print(f"  Proceeding to generate data for scale factor={scale_factor} into this directory")
     print("\n" + "-" * 80)
     print("Step 1: Copying DIGen tool to driver...")
-    copy_directory(f"{workspace_src_path}/tools/datagen", driver_tmp_path, overwrite=True)
+    # Use the directory where this notebook is located
+    datagen_source_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datagen')
+    print(f"  Source path: {datagen_source_path}")
+    copy_directory(datagen_source_path, driver_tmp_path, overwrite=True)
     print("\n" + "-" * 80)
     print("Step 2: Generating data with DIGen...")
     print(f"  Starting data generation for scale factor={scale_factor}")
