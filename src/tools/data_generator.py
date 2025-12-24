@@ -72,28 +72,30 @@ def generate_data():
       missing_vars.append(f"{var_name} ({description})")
   
   if missing_vars:
-    print("\n⚠ ERROR: Required variables are not defined!")
-    print("Missing variables:")
+    error_msg = "\n⚠ ERROR: Required variables are not defined!\n"
+    error_msg += "Missing variables:\n"
     for var in missing_vars:
-      print(f"  - {var}")
-    print("\nThis notebook can be called in two ways:")
-    print("1. Via dbutils.notebook.run() with parameters (recommended)")
-    print("2. Via 'TPC-DI Driver.py' which executes './tools/setup'")
-    print("\nExample dbutils.notebook.run() call:")
-    print('  dbutils.notebook.run(')
-    print('    "path/to/data_generator",')
-    print('    timeout_seconds=3600,')
-    print('    arguments={')
-    print('      "scale_factor": "10",')
-    print('      "catalog": "tpcdi_benchmark",')
-    print('      "tpcdi_directory": "/Volumes/catalog/schema/volume/",')
-    print('      "workspace_src_path": "/Repos/user/repo/src",')
-    print('      "UC_enabled": "True",')
-    print('      "lighthouse": "False"')
-    print('    }')
-    print('  )')
-    print("=" * 80)
-    return
+      error_msg += f"  - {var}\n"
+    error_msg += "\nThis notebook can be called in two ways:\n"
+    error_msg += "1. Via dbutils.notebook.run() with parameters (recommended)\n"
+    error_msg += "2. Via 'TPC-DI Driver.py' which executes './tools/setup'\n"
+    error_msg += "\nExample dbutils.notebook.run() call:\n"
+    error_msg += '  dbutils.notebook.run(\n'
+    error_msg += '    "path/to/data_generator",\n'
+    error_msg += '    timeout_seconds=3600,\n'
+    error_msg += '    arguments={\n'
+    error_msg += '      "scale_factor": "10",\n'
+    error_msg += '      "catalog": "tpcdi_benchmark",\n'
+    error_msg += '      "tpcdi_directory": "/Volumes/catalog/schema/volume/",\n'
+    error_msg += '      "workspace_src_path": "/Repos/user/repo/src",\n'
+    error_msg += '      "UC_enabled": "True",\n'
+    error_msg += '      "lighthouse": "False"\n'
+    error_msg += '    }\n'
+    error_msg += '  )\n'
+    error_msg += "=" * 80
+    print(error_msg)
+    dbutils.notebook.exit(error_msg)
+    raise Exception(error_msg)
   
   DRIVER_ROOT      = "/local_disk0"
   tpcdi_tmp_path   = "/tmp/tpcdi/"
