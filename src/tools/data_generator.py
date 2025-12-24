@@ -83,8 +83,13 @@ def generate_data():
   
   missing_vars = []
   for var_name, description in required_vars.items():
-    if var_name not in globals() or not globals()[var_name]:
+    # Check if variable exists in globals - don't check truthiness because False is valid
+    if var_name not in globals():
       missing_vars.append(f"{var_name} ({description})")
+    # For string variables, also check if they're empty
+    elif var_name in ['scale_factor', 'tpcdi_directory', 'workspace_src_path', 'catalog']:
+      if not globals()[var_name]:
+        missing_vars.append(f"{var_name} ({description})")
   
   if missing_vars:
     error_msg = "\n⚠ ERROR: Required variables are not defined!\n"
