@@ -9,19 +9,35 @@ dbutils.widgets.text("UC_enabled", "True", "Unity Catalog Enabled")
 dbutils.widgets.text("lighthouse", "False", "Lighthouse Flag")
 
 # Read widget values and convert to appropriate types
-scale_factor = dbutils.widgets.get("scale_factor")
-catalog = dbutils.widgets.get("catalog")
-tpcdi_directory = dbutils.widgets.get("tpcdi_directory")
-workspace_src_path = dbutils.widgets.get("workspace_src_path")
-UC_enabled = dbutils.widgets.get("UC_enabled").lower() == "true"
-lighthouse = dbutils.widgets.get("lighthouse").lower() == "true"
+# These need to be in global scope for generate_data() to access them
+widget_scale_factor = dbutils.widgets.get("scale_factor")
+widget_catalog = dbutils.widgets.get("catalog")
+widget_tpcdi_directory = dbutils.widgets.get("tpcdi_directory")
+widget_workspace_src_path = dbutils.widgets.get("workspace_src_path")
+widget_UC_enabled = dbutils.widgets.get("UC_enabled").lower() == "true"
+widget_lighthouse = dbutils.widgets.get("lighthouse").lower() == "true"
 
-# If widgets weren't set (empty strings), check if variables exist in global scope
-# This maintains backward compatibility with the old approach
-if not tpcdi_directory and 'tpcdi_directory' not in globals():
-    print("⚠ tpcdi_directory not provided via widget or global variable")
-if not workspace_src_path and 'workspace_src_path' not in globals():
-    print("⚠ workspace_src_path not provided via widget or global variable")
+# Set global variables if widgets were provided (not empty)
+if widget_scale_factor:
+    scale_factor = widget_scale_factor
+if widget_catalog:
+    catalog = widget_catalog
+if widget_tpcdi_directory:
+    tpcdi_directory = widget_tpcdi_directory
+if widget_workspace_src_path:
+    workspace_src_path = widget_workspace_src_path
+if widget_UC_enabled is not None:
+    UC_enabled = widget_UC_enabled
+if widget_lighthouse is not None:
+    lighthouse = widget_lighthouse
+
+print(f"📋 Variables loaded:")
+print(f"  scale_factor: {scale_factor if 'scale_factor' in dir() else 'NOT SET'}")
+print(f"  catalog: {catalog if 'catalog' in dir() else 'NOT SET'}")
+print(f"  tpcdi_directory: {tpcdi_directory if 'tpcdi_directory' in dir() else 'NOT SET'}")
+print(f"  workspace_src_path: {workspace_src_path if 'workspace_src_path' in dir() else 'NOT SET'}")
+print(f"  UC_enabled: {UC_enabled if 'UC_enabled' in dir() else 'NOT SET'}")
+print(f"  lighthouse: {lighthouse if 'lighthouse' in dir() else 'NOT SET'}")
 
 # COMMAND ----------
 import os
