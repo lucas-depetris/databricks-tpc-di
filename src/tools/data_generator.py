@@ -167,9 +167,11 @@ def generate_data():
     print(f"  Proceeding to generate data for scale factor={scale_factor} into this directory")
     print("\n" + "-" * 80)
     print("Step 1: Copying DIGen tool to driver...")
-    # Use the directory where this notebook is located
-    datagen_source_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'datagen')
+    # workspace_src_path points to .../databricks-tpc-di/src
+    # datagen is in .../databricks-tpc-di/src/tools/datagen
+    datagen_source_path = f"{workspace_src_path}/tools/datagen"
     print(f"  Source path: {datagen_source_path}")
+    print(f"  Target path: {driver_tmp_path}")
     copy_directory(datagen_source_path, driver_tmp_path, overwrite=True)
     print("\n" + "-" * 80)
     print("Step 2: Generating data with DIGen...")
