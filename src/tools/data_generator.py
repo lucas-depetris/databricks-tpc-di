@@ -52,6 +52,25 @@ def move_file(source_location, target_location):
   shutil.copyfile(source_location, target_location)
   return f"Finished moving {source_location} to {target_location}"
 
+def copy_directory_from_repo(source_dir, target_dir, overwrite):
+  """Copy directory from Databricks workspace (/Repos) to local filesystem using dbutils."""
+  if os.path.exists(target_dir) and overwrite:
+    print(f"Overwrite set to true. Deleting: {target_dir}.")
+    shutil.rmtree(target_dir)
+    print(f"Deleted {target_dir}.")
+  try:
+    # Create target directory
+    os.makedirs(target_dir, exist_ok=True)
+    
+    # Use dbutils to recursively copy files from workspace to local
+    # dbutils.fs.cp supports /Repos paths
+    dbutils.fs.cp(source_dir, f"file:{target_dir}", recurse=True)
+    print(f"Copied {source_dir} to {target_dir} successfully!")
+    return target_dir
+  except Exception as e:
+    print(f"Error copying directory: {e}")
+    raise
+
 def copy_directory(source_dir, target_dir, overwrite):
   if os.path.exists(target_dir) and overwrite:
     print(f"Overwrite set to true. Deleting: {target_dir}.")
@@ -172,7 +191,7 @@ def generate_data():
     datagen_source_path = f"{workspace_src_path}/tools/datagen"
     print(f"  Source path: {datagen_source_path}")
     print(f"  Target path: {driver_tmp_path}")
-    copy_directory(datagen_source_path, driver_tmp_path, overwrite=True)
+    copy_directory_from_repo(datagen_source_path, driver_tmp_path, overwrite=True)
     print("\n" + "-" * 80)
     print("Step 2: Generating data with DIGen...")
     print(f"  Starting data generation for scale factor={scale_factor}")
